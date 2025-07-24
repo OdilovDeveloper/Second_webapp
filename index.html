@@ -183,29 +183,34 @@
         }
 
         .product-description {
-            max-height: 150px;
+            height: 100px;
             font-size: 16px;
             color: #666;
             line-height: 1.5;
             margin-bottom: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .product-description-inner {
-            height: 150px;
-            overflow-y: scroll;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            /* iOS uchun smooth scroll */
             scroll-behavior: smooth;
+            /* Barcha brauzerlar uchun */
         }
 
-        .product-description-inner::-webkit-scrollbar {
-            width: 6px;
+        .product-description::-webkit-scrollbar {
+            width: 10px;
         }
 
-        .product-description-inner::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
+        .product-description::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .product-description::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-description::-webkit-scrollbar-thumb:hover {
+            background-color: #888;
         }
 
         .action-button {
