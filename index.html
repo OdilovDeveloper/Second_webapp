@@ -188,11 +188,17 @@
             color: #666;
             line-height: 1.5;
             margin-bottom: 20px;
-            overflow-y: auto;
+            overflow: hidden;
+            position: relative;
+        }
 
-            /* Mobil scrollni yumshoq qilish uchun */
+        /* Scroll joyini maskalab, ichki container scroll qiladi */
+        .product-description-inner {
+            max-height: 100px;
+            overflow-y: scroll;
+
+            /* iOS scroll smoothing */
             -webkit-overflow-scrolling: touch;
-            /* iOS uchun inertia scroll */
             scroll-behavior: smooth;
 
             /* Scrollbarni yashirish */
@@ -201,6 +207,11 @@
             -ms-overflow-style: none;
             /* IE */
         }
+
+        .product-description-inner::-webkit-scrollbar {
+            display: none;
+        }
+
 
         .action-button {
             width: 100%;
