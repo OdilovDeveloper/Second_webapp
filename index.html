@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Product Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            touch-action: pan-y;
+        }
+
+        .showcase-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .products-viewport {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 350px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .product-image {
+            position: absolute;
+            width: 280px;
+            height: 350px;
+            border-radius: 20px;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .product-image.center {
+            transform: translateX(0) scale(1) translateZ(0);
+            z-index: 10;
+            filter: blur(0px);
+            opacity: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .product-image.left {
+            transform: translateX(-200px) scale(0.75) translateZ(-100px);
+            z-index: 5;
+            filter: blur(2px);
+            opacity: 0.6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image.right {
+            transform: translateX(200px) scale(0.75) translateZ(-100px);
+            z-index: 5;
+            filter: blur(2px);
+            opacity: 0.6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image.far-left {
+            transform: translateX(-400px) scale(0.5) translateZ(-200px);
+            z-index: 1;
+            filter: blur(4px);
+            opacity: 0.3;
+            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image.far-right {
+            transform: translateX(400px) scale(0.5) translateZ(-200px);
+            z-index: 1;
+            filter: blur(4px);
+            opacity: 0.3;
+            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            position: relative;
+        }
+
+        .product-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .product-icon img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-category {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-container {
+            position: fixed;
+            bottom: 75px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 100;
+        }
+
+        .text-content {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .text-content.fade-out {
+            opacity: 0;
+        }
+
+        .product-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .action-button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress-dots {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 101;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .swipe-indicator {
+            position: absolute;
+            bottom: 300px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            text-align: center;
+            animation: fadeInOut 3s infinite;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1000;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
+            color: #333;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @media (max-width: 430px) {
+            .product-image {
+                width: 250px;
+                height: 320px;
+            }
+
+            .product-image.left,
+            .product-image.right {
+                transform: translateX(-150px) scale(0.7) translateZ(-100px);
+            }
+
+            .product-image.right {
+                transform: translateX(150px) scale(0.7) translateZ(-100px);
+            }
+
+            .text-container {
+                left: 15px;
+                right: 15px;
+                padding: 25px;
+            }
+
+            .product-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="showcase-container" id="showcase">
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <div class="products-viewport" id="productsViewport" style="display: none;">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+
+        <div class="swipe-indicator" style="display: none;">
+            ← Swipe to explore →
+        </div>
+
+        <div class="text-container" style="display: none;" id="textContainer">
+            <div class="text-content" id="textContent">
+                <div class="product-name" id="productName"></div>
+                <div class="product-price" id="productPrice"></div>
+                <div class="product-description" id="productDescription"></div>
+                <button class="action-button" id="actionButton">Mahsulotni ko'rish</button>
+            </div>
+        </div>
+
+        <div class="progress-dots" id="progressDots" style="display: none;">
+            <!-- Dots will be dynamically created -->
+        </div>
+    </div>
+
+    <script>
+        class ProductShowcase {
+            constructor() {
+                this.currentIndex = 0;
+                this.products = [];
+                this.productData = [];
+                this.totalProducts = 0;
+                this.apiUrl = 'http://127.0.0.1:8000/api/v1/productlist/'; // Change this to your API URL
+
+                // Touch handling
+                this.startX = 0;
+                this.currentX = 0;
+                this.isDragging = false;
+                this.threshold = 80;
+
+                // DOM elements
+                this.showcase = document.getElementById('showcase');
+                this.productsViewport = document.getElementById('productsViewport');
+                this.textContent = document.getElementById('textContent');
+                this.textContainer = document.getElementById('textContainer');
+                this.progressDots = document.getElementById('progressDots');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+
+                // Predefined gradient colors for product icons
+                this.gradients = [
+                    'linear-gradient(135deg, #ff6b9d, #c44569)',
+                    'linear-gradient(135deg, #4facfe, #00f2fe)',
+                    'linear-gradient(135deg, #fa709a, #fee140)',
+                    'linear-gradient(135deg, #a8edea, #fed6e3)',
+                    'linear-gradient(135deg, #ffecd2, #fcb69f)',
+                    'linear-gradient(135deg, #667eea, #764ba2)',
+                    'linear-gradient(135deg, #f093fb, #f5576c)',
+                    'linear-gradient(135deg, #4facfe, #00f2fe)'
+                ];
+
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.fetchProducts();
+                    this.createProductElements();
+                    this.createDots();
+                    this.updateShowcase();
+                    this.addEventListeners();
+                    this.hideLoadingAndShow();
+                    this.hideSwipeIndicator();
+                } catch (error) {
+                    this.showError('Ma\'lumotlarni yuklashda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+                }
+            }
+
+            async fetchProducts() {
+                try {
+                    const response = await fetch(this.apiUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    this.productData = await response.json();
+                    this.totalProducts = this.productData.length;
+
+                    if (this.totalProducts === 0) {
+                        throw new Error('Mahsulotlar topilmadi');
+                    }
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                    throw error;
+                }
+            }
+
+            createProductElements() {
+                this.productData.forEach((product, index) => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'product-image';
+                    productElement.setAttribute('data-index', index);
+
+                    const gradient = this.gradients[index % this.gradients.length];
+
+                    productElement.innerHTML = `
+                        <div class="product-content">
+                            <div class="product-icon" style="background: ${gradient};">
+                                <img src="${product.image}" alt="${product.title}" onerror="this.style.display='none';">
+                            </div>
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-category">${product.category}</div>
+                        </div>
+                    `;
+
+                    this.productsViewport.appendChild(productElement);
+                });
+
+                this.products = document.querySelectorAll('.product-image');
+            }
+
+            createDots() {
+                this.progressDots.innerHTML = '';
+                this.productData.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.setAttribute('data-index', index);
+                    if (index === 0) dot.classList.add('active');
+
+                    dot.addEventListener('click', () => {
+                        this.currentIndex = index;
+                        this.updateShowcase();
+                    });
+
+                    this.progressDots.appendChild(dot);
+                });
+            }
+
+            hideLoadingAndShow() {
+                this.loadingSpinner.style.display = 'none';
+                this.productsViewport.style.display = 'flex';
+                this.textContainer.style.display = 'block';
+                this.progressDots.style.display = 'flex';
+                document.querySelector('.swipe-indicator').style.display = 'block';
+            }
+
+            showError(message) {
+                this.loadingSpinner.style.display = 'none';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.innerHTML = `
+                    <h3>Xatolik</h3>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Qayta yuklash</button>
+                `;
+                this.showcase.appendChild(errorDiv);
+            }
+
+            hideSwipeIndicator() {
+                setTimeout(() => {
+                    const indicator = document.querySelector('.swipe-indicator');
+                    if (indicator) {
+                        indicator.style.opacity = '0';
+                        indicator.style.transition = 'opacity 1s ease';
+                    }
+                }, 4000);
+            }
+
+            addEventListeners() {
+                // Touch events
+                this.showcase.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+                this.showcase.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+                this.showcase.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
+                // Mouse events for desktop testing
+                this.showcase.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.showcase.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.showcase.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                this.showcase.addEventListener('mouseleave', (e) => this.handleMouseUp(e));
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        this.goToPrevious();
+                    } else if (e.key === 'ArrowRight') {
+                        this.goToNext();
+                    }
+                });
+            }
+
+            handleTouchStart(e) {
+                this.startX = e.touches[0].clientX;
+                this.isDragging = true;
+            }
+
+            handleTouchMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault();
+                this.currentX = e.touches[0].clientX;
+            }
+
+            handleTouchEnd(e) {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+
+                const deltaX = this.startX - this.currentX;
+
+                if (Math.abs(deltaX) > this.threshold) {
+                    if (deltaX > 0) {
+                        this.goToNext();
+                    } else {
+                        this.goToPrevious();
+                    }
+                }
+            }
+
+            handleMouseDown(e) {
+                this.startX = e.clientX;
+                this.isDragging = true;
+            }
+
+            handleMouseMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault();
+                this.currentX = e.clientX;
+            }
+
+            handleMouseUp(e) {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+
+                const deltaX = this.startX - this.currentX;
+
+                if (Math.abs(deltaX) > this.threshold) {
+                    if (deltaX > 0) {
+                        this.goToNext();
+                    } else {
+                        this.goToPrevious();
+                    }
+                }
+            }
+
+            goToNext() {
+                this.currentIndex = (this.currentIndex + 1) % this.totalProducts;
+                this.updateShowcase();
+            }
+
+            goToPrevious() {
+                this.currentIndex = (this.currentIndex - 1 + this.totalProducts) % this.totalProducts;
+                this.updateShowcase();
+            }
+
+            updateShowcase() {
+                // Update product positions
+                this.products.forEach((product, index) => {
+                    product.className = 'product-image';
+
+                    const position = this.getRelativePosition(index);
+
+                    switch (position) {
+                        case 0:
+                            product.classList.add('center');
+                            break;
+                        case -1:
+                            product.classList.add('left');
+                            break;
+                        case 1:
+                            product.classList.add('right');
+                            break;
+                        case -2:
+                        case -3:
+                            product.classList.add('far-left');
+                            break;
+                        case 2:
+                        case 3:
+                            product.classList.add('far-right');
+                            break;
+                    }
+                });
+
+                // Update dots
+                const dots = document.querySelectorAll('.dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+
+                // Update text content with animation
+                this.updateTextContent();
+            }
+
+            getRelativePosition(index) {
+                let diff = index - this.currentIndex;
+
+                // Handle circular array
+                if (diff > this.totalProducts / 2) {
+                    diff -= this.totalProducts;
+                } else if (diff < -this.totalProducts / 2) {
+                    diff += this.totalProducts;
+                }
+
+                return diff;
+            }
+
+            updateTextContent() {
+                this.textContent.classList.add('fade-out');
+
+                setTimeout(() => {
+                    const product = this.productData[this.currentIndex];
+                    document.getElementById('productName').textContent = product.title;
+                    document.getElementById('productPrice').textContent = `${product.price} so'm`;
+                    document.getElementById('productDescription').textContent = product.description;
+
+                    this.textContent.classList.remove('fade-out');
+                }, 150);
+            }
+        }
+
+        // Initialize showcase when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProductShowcase();
+        });
+    </script>
+</body>
+
+</html>
