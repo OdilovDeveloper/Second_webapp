@@ -183,7 +183,7 @@
         }
 
         .product-description {
-            max-height: 100px;
+            max-height: 150px;
             font-size: 16px;
             color: #666;
             line-height: 1.5;
@@ -192,26 +192,21 @@
             position: relative;
         }
 
-        /* Scroll joyini maskalab, ichki container scroll qiladi */
         .product-description-inner {
-            max-height: 100px;
+            height: 150px;
             overflow-y: scroll;
-
-            /* iOS scroll smoothing */
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
-
-            /* Scrollbarni yashirish */
-            scrollbar-width: none;
-            /* Firefox */
-            -ms-overflow-style: none;
-            /* IE */
         }
 
         .product-description-inner::-webkit-scrollbar {
-            display: none;
+            width: 6px;
         }
 
+        .product-description-inner::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
 
         .action-button {
             width: 100%;
