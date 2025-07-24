@@ -337,7 +337,7 @@
                 <div class="product-name" id="productName"></div>
                 <div class="product-price" id="productPrice"></div>
                 <div class="product-description" id="productDescription"></div>
-                <button class="action-button" id="actionButton">Mahsulotni ko'rish</button>
+                <button class="action-button" id="actionButton">Buyurtma berish</button>
             </div>
         </div>
 
@@ -630,6 +630,12 @@
                     document.getElementById('productName').textContent = product.title;
                     document.getElementById('productPrice').textContent = `${product.price} so'm`;
                     document.getElementById('productDescription').textContent = product.description;
+
+                    // 🚀 Buyurtma berish tugmasiga LINK biriktirish
+                    const actionButton = document.getElementById('actionButton');
+                    actionButton.onclick = () => {
+                        window.open(product.order_link, '_blank');  // yangi oynada ochiladi
+                    };
 
                     this.textContent.classList.remove('fade-out');
                 }, 150);
